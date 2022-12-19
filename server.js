@@ -9,6 +9,8 @@ const path= require("path")
 const moment=require("moment")
 const config=require("./config/config.json")
 const rateLimit = require('express-rate-limit')
+const helmet = require("helmet");
+
 //Config Setups
 const PORT=process.env.PORT||config.PORT;
 const Environment=process.env.NODE_ENV||config.ENVIROMENT
@@ -62,6 +64,8 @@ const limiter = rateLimit({
 
 // Apply the rate limiting middleware to all requests
 app.use(limiter)
+app.use(helmet());
+app.use(express.urlencoded({extended:true}));
 
 //Routes for all the different modules 
 app.use("/test",test);
