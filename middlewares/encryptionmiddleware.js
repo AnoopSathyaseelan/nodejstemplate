@@ -1,0 +1,4 @@
+
+exports.encryption=(data)=>{
+
+}

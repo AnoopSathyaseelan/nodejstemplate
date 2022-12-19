@@ -8,13 +8,16 @@ const fs= require("fs")
 const path= require("path")
 const moment=require("moment")
 const config=require("./config/config.json")
+const rateLimit = require('express-rate-limit')
 //Config Setups
 const PORT=process.env.PORT||config.PORT;
 const Environment=process.env.NODE_ENV||config.ENVIROMENT
 
 //Route Imports
 const test=require('./modules/main/route')
-const login=require('./modules/login/route')
+const login=require('./modules/login/route');
+const { request } = require("https");
+const { response } = require("express");
 
 //logger
 app.use(bodyParser.json())
@@ -42,6 +45,23 @@ const log = fs.createWriteStream(
     logIP:true,
   });
 
+//Rate limiter
+const limiter = rateLimit({
+	windowMs: 60* 60 * 1000, // 15 minutes
+	max: 1500, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: true, // Disable the `X-RateLimit-*` headers
+    keyGenerator:(request,response)=>request.ip,
+    handler:(request,response,next,options)=>{
+        response.status(429).send({
+            Return_status:-1000,
+            Return_message:"To many Requests from this ip, please try again in a hour"
+        })
+    }
+})
+
+// Apply the rate limiting middleware to all requests
+app.use(limiter)
 
 //Routes for all the different modules 
 app.use("/test",test);
