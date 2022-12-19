@@ -7,13 +7,14 @@ const morgan = require('morgan');
 const fs= require("fs")
 const path= require("path")
 const moment=require("moment")
+const config=require("./config/config.json")
 //Config Setups
-const PORT=3000;
-const Environment="DEV"
+const PORT=process.env.PORT||config.PORT;
+const Environment=process.env.NODE_ENV||config.ENVIROMENT
 
 //Route Imports
-const test=require('./main/mainroute')
-
+const test=require('./modules/main/route')
+const login=require('./modules/login/route')
 
 //logger
 app.use(bodyParser.json())
@@ -44,6 +45,7 @@ const log = fs.createWriteStream(
 
 //Routes for all the different modules 
 app.use("/test",test);
+app.use("/User",login);
 
 //server Port
 app.listen(PORT,()=>{
